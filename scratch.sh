@@ -3,4 +3,4 @@ npx sequelize-cli \
   --name Message \
   --attributes content:text,recipient:string,sender:string
 
-npx sequelize-cli db:migrate
+npx sequelize-cli db:migrate --env production

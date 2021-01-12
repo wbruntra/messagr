@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  db:
+    image: mariadb:10
+    environment:
+      MYSQL_ROOT_PASSWORD: devpw
+      MYSQL_DATABASE: messagr_dev
+    volumes:
+      - messagr-devdb:/var/lib/mysql
+    ports:
+      - "3309:3306"
+         
+volumes:
+  messagr-devdb:
+    driver: local

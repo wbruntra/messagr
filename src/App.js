@@ -117,12 +117,12 @@ const App = () => {
           <p>{saidNo ? "Okay, let's try again." : ''} Sign in:</p>
           <form onSubmit={handleInit}>
             <div className="form-group">
-              <label for="login-input">Username</label>
+              <label htmlFor="login-input">Username</label>
               <input
                 id="login-input"
                 autoFocus
                 value={loginName}
-                className="form-control w-25"
+                className="form-control username-input"
                 onChange={(e) => {
                   setLoginName(e.target.value)
                 }}

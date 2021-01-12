@@ -41,7 +41,7 @@ const Single = (props) => {
     const intervalId = prog()
 
     return () => window.clearInterval(intervalId)
-  }, [])
+  }, [sendingTo])
 
   useEffect(() => {
     getMessages(sendingTo)
@@ -76,14 +76,21 @@ const Single = (props) => {
       </div>
 
       <form className="chat-form" onSubmit={sendMessage}>
-        <input
-          className="mr-2 shadow"
-          value={message}
-          onChange={(e) => {
-            setMessage(e.target.value)
-          }}
-        />
-        <input type="submit" className="btn btn-primary" />
+        <div className="row">
+          <div className="col-10">
+            <input
+              autoFocus
+              value={message}
+              onChange={(e) => {
+                setMessage(e.target.value)
+              }}
+            />
+          </div>
+
+          <div className="col-2">
+            <input type="submit" className="btn btn-primary" value=">" />
+          </div>
+        </div>
       </form>
     </>
   )

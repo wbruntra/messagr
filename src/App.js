@@ -130,6 +130,7 @@ const App = () => {
             </div>
             <input className="btn btn-secondary" type="submit" />
           </form>
+          <p>Note: Only <span className="bold">honest</span> people are allowed to use this app!</p>
         </header>
       </div>
     )

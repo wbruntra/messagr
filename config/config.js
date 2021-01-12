@@ -20,6 +20,7 @@ module.exports = {
     username: keys.prod_db_user,
     password: keys.prod_db_password,
     database: keys.prod_db,
+    port: keys.prod_port,
     host: '127.0.0.1',
     dialect: 'mysql',
   },

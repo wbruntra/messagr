@@ -1,6 +1,7 @@
 var express = require('express')
 var router = express.Router()
 const { Op } = require('sequelize')
+const { client } = require('./db')
 
 const db = require('./models/index')
 
@@ -77,40 +78,79 @@ router.post('/user/create', (req, res) => {
     })
 })
 
-router.get('/messages/:sender', (req, res) => {
+router.get('/messages/unread', async (req, res) => {
   const username = req.session.username
-  const { sender } = req.params
 
-  console.log('msg between', username, sender)
+  console.log('get unread for', username)
 
-  // [Op.or]: [
-  //   {
-  //     sender: username,
-  //     recipient: sender,
-  //   },
-  // ],
+  const messages = await client
+    .select('sender')
+    .from('Messages')
+    .where({
+      recipient: username,
+    })
+    .whereNot({
+      read: 1,
+    })
+    .groupBy('sender')
+    .count('*', { as: 'unreadCount' })
 
-  Message.findAll({
-    where: {
-      [Op.or]: [
-        {
-          recipient: username,
-          sender,
-        },
-        {
-          recipient: sender,
-          sender: username,
-        },
-      ],
-    },
+  return res.json(messages)
+})
+
+router.get('/messages/refresh/:sender', async (req, res) => {
+  const thisUser = req.session.username
+  const { sender: otherUser } = req.params
+
+  console.log('refresh', thisUser)
+
+  const messages = await client.select().from('Messages').where({
+    recipient: thisUser,
+    sender: otherUser,
+    read: 0,
   })
-    .then((messages) => {
-      return res.json(messages)
+
+  await client
+    .select()
+    .from('Messages')
+    .where({
+      recipient: thisUser,
+      sender: otherUser,
+      read: 0,
     })
-    .catch((err) => {
-      console.log(err)
-      return res.sendStatus(500)
+    .update({ read: 1 })
+
+  return res.json(messages)
+})
+
+router.get('/messages/:sender', async (req, res) => {
+  const thisUser = req.session.username
+  const { sender: otherUser } = req.params
+
+  console.log('msg between', thisUser, otherUser)
+
+  await client
+    .select()
+    .from('Messages')
+    .where({
+      sender: otherUser,
+      recipient: thisUser,
     })
+    .update({ read: 1 })
+
+  const messages = await client
+    .select()
+    .from('Messages')
+    .where({
+      sender: thisUser,
+      recipient: otherUser,
+    })
+    .orWhere({
+      recipient: thisUser,
+      sender: otherUser,
+    })
+
+  return res.json(messages)
 })
 
 router.get('/messages', (req, res) => {

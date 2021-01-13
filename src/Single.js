@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import axios from 'axios'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import dateFormat from 'dateformat'
 
 const Single = (props) => {
@@ -10,6 +10,9 @@ const Single = (props) => {
 
   const [messages, setMessages] = useState([])
   const [message, setMessage] = useState('')
+
+  const messageList = useRef(null)
+  messageList.current = messages
 
   const sendMessage = (e) => {
     e.preventDefault()
@@ -35,8 +38,13 @@ const Single = (props) => {
   useEffect(() => {
     const prog = () => {
       return window.setInterval(() => {
-        getMessages(sendingTo)
-      }, 15000)
+        axios.get(`/api/messages/refresh/${sendingTo}`).then((res) => {
+          if (res.data.length !== 0) {
+            console.log(res.data)
+            setMessages([...messageList.current, ...res.data])
+          }
+        })
+      }, 10000)
     }
     const intervalId = prog()
 

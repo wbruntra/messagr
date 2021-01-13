@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Single from './Single'
 import { BrowserRouter as Router, Switch, Route, Link, useHistory } from 'react-router-dom'
+import { keyBy, get } from 'lodash'
 
 const PageHeader = ({ currentUser, reset }) => {
   let history = useHistory()
@@ -24,6 +25,7 @@ const PageHeader = ({ currentUser, reset }) => {
 
 const Main = ({ currentUser }) => {
   const [users, setUsers] = useState([])
+  const [unread, setUnread] = useState([])
 
   let history = useHistory()
 
@@ -34,8 +36,18 @@ const Main = ({ currentUser }) => {
       setUsers(res.data)
     }
 
+    const getUnread = async () => {
+      const res = await axios.get('/api/messages/unread')
+      console.log(res.data)
+      const newUnreads = keyBy(res.data, 'sender')
+      setUnread(newUnreads)
+    }
+
     getUsers()
+    getUnread()
   }, [])
+
+  console.log(unread)
 
   return (
     <>
@@ -44,6 +56,7 @@ const Main = ({ currentUser }) => {
       <ul className="list-group friends">
         {users.map((u) => {
           if (u.name !== currentUser) {
+            const unreadCount = get(unread[u.name], 'unreadCount')
             return (
               <li
                 key={u.id}
@@ -52,7 +65,7 @@ const Main = ({ currentUser }) => {
                   history.push(`/chat/${u.name}`)
                 }}
               >
-                {u.name}
+                {u.name} {unreadCount && <span className="unread ml-4">{unreadCount}</span>}
               </li>
             )
           }
@@ -130,7 +143,9 @@ const App = () => {
             </div>
             <input className="btn btn-secondary" type="submit" />
           </form>
-          <p>Note: Only <span className="bold">honest</span> people are allowed to use this app!</p>
+          <p>
+            Note: Only <span className="bold">honest</span> people are allowed to use this app!
+          </p>
         </header>
       </div>
     )

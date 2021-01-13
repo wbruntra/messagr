@@ -29,6 +29,14 @@ body {
   color: white;
 }
 
+.unread {
+  background-color: $lighter-brown;
+  color: $light-black;
+  font-size: 14px;
+  border-radius: 50%;
+  padding: 0 6px;
+}
+
 // .App-header {
 //   min-height: 100vh;
 //   display: flex;
